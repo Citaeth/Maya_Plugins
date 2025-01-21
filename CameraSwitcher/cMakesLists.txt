@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.15)
+
+PROJECT (CameraSwitcher)
+
+SET(MAYA_BASE_LOCATION "C:/Program Files/Autodesk")
+SET(MAYA_VERSIONS
+    "2025")
+
+SET(CameraSwitcherFiles
+    camera_switcher.h
+    camera_switcher.cpp
+)
+
+SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+######################################################################################## Plugins, Foreach in case of more than on version to support
+FOREACH(MAYA_VERSION ${MAYA_VERSIONS})
+
+    SET(MAYA_LOCATION "${MAYA_BASE_LOCATION}/Maya${MAYA_VERSION}")
+
+    include_directories(${MAYA_LOCATION}/include)
+    link_directories(${MAYA_LOCATION}/lib)
+
+    add_library(CameraSwitcher_${MAYA_VERSION} SHARED ${CameraSwitcherFiles})
+
+    target_link_libraries(CameraSwitcher_${MAYA_VERSION} OpenMaya Foundation)
+
+    set_target_properties(CameraSwitcher_${MAYA_VERSION} PROPERTIES
+        OUTPUT_NAME "CameraSwitcher"
+        PREFIX ""
+        SUFFIX ".mll"
+    )
+
+	install(TARGETS CameraSwitcher_${MAYA_VERSION}
+    RUNTIME DESTINATION "${MAYA_LOCATION}/bin/plug-ins"
+)
+ENDFOREACH()
